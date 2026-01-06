@@ -1,6 +1,6 @@
 import express from "express";
-import {  openMongooseConnection } from "./services";
-import { HealthCheckController } from "./controllers";
+import {  openMongooseConnection, UserService} from "./services";
+import { HealthCheckController, UserController,  } from "./controllers";
 import { config } from "dotenv";
 config();
 async function main() : Promise<void> {
@@ -11,7 +11,15 @@ async function main() : Promise<void> {
     const healthCheckController = new HealthCheckController();
     app.use("/health-check", healthCheckController.buildRouter());
 
+    const userService = new UserService(mongooseConnexion);
+
+
+
     
+
+    const userController = new UserController(userService);
+    app.use("/users", userController.buildRouter());
+
 
     const PORT = process.env.PORT as string;
     app.listen(PORT, () => {
