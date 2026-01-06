@@ -1,0 +1,25 @@
+{
+  "name": "tp_note_hopital_grondin_florent_4iw1",
+  "version": "1.0.0",
+  "description": "tp note hopital",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "bs": "npm run build && npm run start",
+    "dev:up": "docker compose up -d && npm run bs",
+    "down": "docker compose down -v"
+  },
+  "author": "Grondin Florent",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongoose": "^8.19.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3"
+  }
+}
