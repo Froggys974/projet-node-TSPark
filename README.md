@@ -68,6 +68,17 @@ Pour lancer les tests :
 npm test
 ```
 
+## Utilisation avec Postman
+
+Un fichier de collection Postman `TP_Park_Postman_Collection.json` est fourni à la racine du projet.
+
+1. **Ouvrez Postman**.
+2. Cliquez sur **Import** (en haut à gauche).
+3. Glissez-déposez le fichier `TP_Park_Postman_Collection.json`.
+4. Assurez-vous que votre serveur tourne (`npm run dev:up`).
+5. Vous pouvez maintenant lancer les requêtes depuis la collection importée "TP Park API".
+   - La variable `{{baseUrl}}` est configurée par défaut sur `http://localhost:3000`.
+
 ## Technologies
 
 - **Runtime** : Node.js
