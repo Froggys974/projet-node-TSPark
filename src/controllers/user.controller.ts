@@ -3,7 +3,7 @@ import { UserService } from "../services";
 
 export class UserController {
 
-    constructor(private readonly userService: UserService) {}
+    constructor(private readonly userService: UserService,) {}
 
     async getAllUsers(req: Request, res: Response): Promise<void> {
         const users = await this.userService.getAllUsers();
