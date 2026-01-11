@@ -9,7 +9,7 @@
     "bs": "npm run build && npm run start",
     "dev:up": "docker compose up -d && npm run bs",
     "down": "docker compose down -v",
-    "test": "node --no-warnings node_modules/jest/bin/jest.js --verbose"
+    "test": "node --no-warnings node_modules/jest/bin/jest.js --verbose --runInBand"
   },
   "author": "Grondin Florent, Vanderlynden Louis-Martin, Diawara Adama",
   "license": "ISC",

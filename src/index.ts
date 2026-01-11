@@ -3,13 +3,18 @@ import { GymOwnerService, openMongooseConnection, UserService, ChallengeParticip
 import { HealthCheckController, GymOwnerController, UserController, ChallengeParticipationController, TrainingRoomController, ChallengeController, BadgeController } from "./controllers";
 import { config } from "dotenv";
 config();
-async function main() : Promise<void> {
-    const mongooseConnexion = await openMongooseConnection();
+export async function createApp(mongooseConnexion: any): Promise<express.Application> {
     const app = express();
     app.use(express.json());
 
     const healthCheckController = new HealthCheckController();
     app.use("/health-check", healthCheckController.buildRouter());
+
+    // Global Error Handler
+    app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+        console.error("Unhandled Error:", err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+    });
 
     const challengeParticipationService = new ChallengeParticipationService(mongooseConnexion);
     const userService = new UserService(mongooseConnexion);
@@ -37,12 +42,21 @@ async function main() : Promise<void> {
     const badgeController = new BadgeController(badgeService);
     app.use("/badges", badgeController.buildRouter());
 
-    const PORT = process.env.PORT as string;
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-    });
-
+    return app;
 }
-main().catch((err) => {
-    console.error("Error during main execution:", err);
-});
+
+if (require.main === module) {
+    async function main() : Promise<void> {
+        const mongooseConnexion = await openMongooseConnection();
+        const app = await createApp(mongooseConnexion);
+        
+        const PORT = process.env.PORT as string || 3000;
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    }
+
+    main().catch((err) => {
+        console.error("Error during main execution:", err);
+    });
+}
