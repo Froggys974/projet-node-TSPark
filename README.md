@@ -422,11 +422,11 @@ DELETE /badges/:id                Supprimer badge
    - Selectionner "Upload Files"
 
 2. **Importer les fichiers dans cet ordre :**
-   - D'abord `TP_Park_Postman_Environment.json` (Variables d'environnement)
-   - Puis `TP_Park_Postman_Collection.json` (Collection complète)
+   - D'abord `Postman_Environment.json` (Variables d'environnement)
+   - Puis `Postman_Collection.json` (Collection complète)
 
 3. **Selectionner l'environnement**
-   - En haut à droite, dans le dropdown "Environments", selectionner `TP_Park_Postman_Environment`
+   - En haut à droite, dans le dropdown "Environments", selectionner `Postman_Environment`
    - Verifier que les variables sont visibles (icône "eye" en haut)
 
 ### Utilisation de la Collection
@@ -451,9 +451,6 @@ La collection inclut des exemples complets pour tous les endpoints. Les variable
    - Des exemples sont fournis pour chaque role (USER, GYM_OWNER, ADMIN)
    - Switcher entre les roles en changeant le token via login
 
-### Importer les fichiers:
-- `TP_Park_Postman_Collection.json` - Collection complete avec exemples
-- `TP_Park_Postman_Environment.json` - Variables d'environnement (mise à jour auto)
 
 Les tokens JWT sont captures automatiquement apres login/register et stockes dans `auth_token`.
 
