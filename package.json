@@ -1,5 +1,5 @@
 {
-  "name": "tp_note_hopital_grondin_florent_4iw1",
+  "name": "tp_park",
   "version": "1.0.0",
   "description": "tp note hopital",
   "main": "index.js",
@@ -8,9 +8,10 @@
     "start": "node dist/index.js",
     "bs": "npm run build && npm run start",
     "dev:up": "docker compose up -d && npm run bs",
-    "down": "docker compose down -v"
+    "down": "docker compose down -v",
+    "test": "node --no-warnings node_modules/jest/bin/jest.js --verbose"
   },
-  "author": "Grondin Florent",
+  "author": "Grondin Florent, Vanderlynden Louis-Martin, Diawara Adama",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^17.2.3",
@@ -19,7 +20,10 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.5",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.10.1",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
     "typescript": "^5.9.3"
   }
 }
