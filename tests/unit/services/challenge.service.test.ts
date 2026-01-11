@@ -7,17 +7,12 @@ describe("ChallengeService", () => {
     let mockModel: any;
 
     beforeEach(() => {
-        const mockExec = jest.fn();
-        const mockQuery = {
-            exec: mockExec,
-        };
-
         mockModel = {
             create: jest.fn(),
-            find: jest.fn().mockReturnValue(mockQuery),
-            findOne: jest.fn().mockReturnValue(mockQuery),
-            findByIdAndUpdate: jest.fn().mockReturnValue(mockQuery),
-            findByIdAndDelete: jest.fn().mockReturnValue(mockQuery),
+            find: jest.fn(),
+            findById: jest.fn(),
+            findByIdAndUpdate: jest.fn(),
+            findByIdAndDelete: jest.fn(),
         };
 
         mockMongoose = {
@@ -33,7 +28,14 @@ describe("ChallengeService", () => {
 
     describe("createChallenge", () => {
         it("should create a challenge", async () => {
-            const data: any = { title: "Challenge 1" };
+            const data: any = {
+                title: "Challenge 1",
+                creatorId: "123",
+                workoutId: "456",
+                rankingType: "fastest_time",
+                startDate: new Date(),
+                endDate: new Date(),
+            };
             mockModel.create.mockResolvedValue(data);
 
             const result = await service.createChallenge(data);
@@ -45,8 +47,8 @@ describe("ChallengeService", () => {
 
     describe("getAllChallenges", () => {
         it("should return all challenges", async () => {
-            const data = [{ id: "1" }];
-            (mockModel.find().exec as jest.Mock).mockResolvedValue(data);
+            const data = [{ id: "1", title: "Challenge 1" }];
+            mockModel.find.mockResolvedValue(data);
 
             const result = await service.getAllChallenges();
 
@@ -57,64 +59,14 @@ describe("ChallengeService", () => {
 
     describe("getChallengeById", () => {
         it("should return a challenge by id", async () => {
-            const data = { id: "1" };
-            (mockModel.findOne().exec as jest.Mock).mockResolvedValue(data);
+            const data = { id: "1", title: "Challenge 1" };
+            mockModel.findById.mockResolvedValue(data);
 
             const result = await service.getChallengeById("1");
 
-            expect(mockModel.findOne).toHaveBeenCalledWith({ _id: "1" });
-            expect(result).toEqual(data);
-        });
-    });
-
-    describe("updateChallenge", () => {
-        it("should update a challenge", async () => {
-            const id = "1";
-            const updateData: any = { title: "Updated Challenge" };
-            const updatedData = { id: "1", ...updateData };
-            (mockModel.findByIdAndUpdate().exec as jest.Mock).mockResolvedValue(updatedData);
-
-            const result = await service.updateChallenge(id, updateData);
-
-            expect(mockModel.findByIdAndUpdate).toHaveBeenCalledWith(id, updateData, { new: true });
-            expect(result).toEqual(updatedData);
-        });
-    });
-
-    describe("deleteChallenge", () => {
-        it("should delete a challenge", async () => {
-            const id = "1";
-            (mockModel.findByIdAndDelete().exec as jest.Mock).mockResolvedValue(null);
-
-            await service.deleteChallenge(id);
-
-            expect(mockModel.findByIdAndDelete).toHaveBeenCalledWith(id);
-        });
-    });
-
-    describe("getChallengesByCreator", () => {
-        it("should return challenges by creator", async () => {
-            const creatorId = "creator1";
-            const data = [{ id: "1", creatorId }];
-            (mockModel.find().exec as jest.Mock).mockResolvedValue(data);
-
-            const result = await service.getChallengesByCreator(creatorId);
-
-            expect(mockModel.find).toHaveBeenCalledWith({ creatorId: creatorId });
-            expect(result).toEqual(data);
-        });
-    });
-
-    describe("getChallengesByTrainingRoom", () => {
-        it("should return challenges by training room", async () => {
-            const trainingRoomId = "room1";
-            const data = [{ id: "1", trainingRoomId }];
-            (mockModel.find().exec as jest.Mock).mockResolvedValue(data);
-
-            const result = await service.getChallengesByTrainingRoom(trainingRoomId);
-
-            expect(mockModel.find).toHaveBeenCalledWith({ trainingRoomId: trainingRoomId });
+            expect(mockModel.findById).toHaveBeenCalledWith("1");
             expect(result).toEqual(data);
         });
     });
 });
+

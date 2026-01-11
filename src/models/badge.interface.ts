@@ -1,10 +1,16 @@
-export type CreateBadge = Omit<Badge, "_id">;
+import { IBadge, BadgeCategory, CriteriaType, BadgeRarity } from "../types";
 
-export interface Badge{
-    _id: string;
+export type Badge = IBadge;
+
+export interface CreateBadge {
     name: string;
-    description: string;
+    description?: string;
     icon?: string;
-    requirement: string;
+    category: BadgeCategory;
+    criteria: {
+        type: CriteriaType;
+        threshold: number;
+    };
     points: number;
+    rarity: BadgeRarity;
 }

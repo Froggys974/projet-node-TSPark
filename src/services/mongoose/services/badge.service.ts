@@ -1,8 +1,7 @@
 import { Model, Mongoose } from "mongoose";
-import { Badge } from "../../../models";
+import { Badge, CreateBadge } from "../../../models";
 import { getBadgeSchema } from "../schema";
-
-export type CreateBadge = Omit<Badge, "_id">;
+import { BadgeCategory, BadgeRarity } from "../../../types";
 
 export class BadgeService {
     readonly badgeModel: Model<Badge>;
@@ -16,19 +15,27 @@ export class BadgeService {
     }
 
     async getAllBadges(): Promise<Badge[]> {
-        return this.badgeModel.find().exec();
+        return this.badgeModel.find();
     }
 
     async getBadgeById(id: string): Promise<Badge | null> {
-        return this.badgeModel.findOne({ _id: id }).exec();
+        return this.badgeModel.findById(id);
     }
 
-    async updateBadge(id: string, badge: CreateBadge): Promise<Badge | null> {
-        return this.badgeModel.findByIdAndUpdate(id, badge, { new: true }).exec();
+    async updateBadge(id: string, badge: Partial<CreateBadge>): Promise<Badge | null> {
+        return this.badgeModel.findByIdAndUpdate(id, badge, { new: true });
     }
 
     async deleteBadge(id: string): Promise<void> {
-        await this.badgeModel.findByIdAndDelete(id).exec();
+        await this.badgeModel.findByIdAndDelete(id);
+    }
+
+    async getBadgesByCategory(category: BadgeCategory): Promise<Badge[]> {
+        return this.badgeModel.find({ category });
+    }
+
+    async getBadgesByRarity(rarity: BadgeRarity): Promise<Badge[]> {
+        return this.badgeModel.find({ rarity });
     }
 
     async checkForBadges(user: any, participation: any, challenge: any): Promise<void> {

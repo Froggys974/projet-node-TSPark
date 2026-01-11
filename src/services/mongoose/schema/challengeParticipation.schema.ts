@@ -2,17 +2,47 @@ import { Schema } from "mongoose";
 import { ChallengeParticipation } from "../../../models";
 
 export function getChallengeParticipationSchema(): Schema<ChallengeParticipation> {
-  return new Schema<ChallengeParticipation>({
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    challengeId: { type: String, required: true },
-    gymOwner: { type: Schema.Types.ObjectId, ref: "GymOwner" },
-    startDate: { type: Date, required: true },
-    endDate: { type: Date },
-    status: { type: String, required: true },
-    progressValue: { type: Number, default: 0 }
-  },{
+  const schema = new Schema<ChallengeParticipation>({
+    challengeId: {
+      type: Schema.Types.ObjectId,
+      ref: "Challenge",
+      required: true
+    },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
+    sessionId: {
+      type: Schema.Types.ObjectId,
+      ref: "WorkoutSession",
+      required: true
+    },
+    score: {
+      type: Number,
+      required: true
+    },
+    rank: {
+      type: Number
+    },
+    pointsEarned: {
+      type: Number,
+      required: true,
+      default: 0
+    },
+    completedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }, {
     collection: "challengeParticipations",
-    versionKey: false
-  }
-);
+    versionKey: false,
+    timestamps: true
+  });
+
+  schema.index({ challengeId: 1, userId: 1 }, { unique: true });
+  schema.index({ challengeId: 1, rank: 1 });
+  schema.index({ userId: 1 });
+
+  return schema;
 }

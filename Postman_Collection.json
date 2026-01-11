@@ -1,0 +1,1403 @@
+{
+	"info": {
+		"_postman_id": "fitness-park-api",
+		"name": "Fitness Park API",
+		"description": "Collection complete pour l'API Fitness Park avec authentification JWT automatique",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health-check",
+							"host": ["{{base_url}}"],
+							"path": ["health-check"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('auth_token', jsonData.token);",
+									"    pm.environment.set('user_id', jsonData.user._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"dateOfBirth\": \"1995-03-22\",\n  \"gender\": \"MALE\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register/user",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register", "user"]
+						}
+					}
+				},
+				{
+					"name": "Register Gym Owner",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('auth_token', jsonData.token);",
+									"    pm.environment.set('gym_owner_id', jsonData.user._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Sophie\",\n  \"lastName\": \"Martin\",\n  \"email\": \"sophie.martin@fitpro.fr\",\n  \"password\": \"GymOwner2024!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register/gym-owner",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register", "gym-owner"]
+						}
+					}
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('auth_token', jsonData.token);",
+									"    pm.environment.set('user_id', jsonData.user._id);",
+									"    if (jsonData.user.role === 'GYM_OWNER') {",
+									"        pm.environment.set('gym_owner_id', jsonData.user._id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login Gym Owner",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('auth_token', jsonData.token);",
+									"    pm.environment.set('gym_owner_id', jsonData.user._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"sophie.martin@fitpro.fr\",\n  \"password\": \"GymOwner2024!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login/gym-owner",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login", "gym-owner"]
+						}
+					}
+				},
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('auth_token', jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@fitnesspark.com\",\n  \"password\": \"Admin123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login/admin",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login", "admin"]
+						}
+					}
+				},
+				{
+					"name": "Get My Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "me"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get All Users (ADMIN)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": ["{{base_url}}"],
+							"path": ["users"]
+						}
+					}
+				},
+				{
+					"name": "Get User By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Update User (ADMIN)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"John Updated\",\n  \"points\": 500,\n  \"level\": 5\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete User (ADMIN)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Activate User (ADMIN)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}/activate",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}", "activate"]
+						}
+					}
+				},
+				{
+					"name": "Deactivate User (ADMIN)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}/deactivate",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}", "deactivate"]
+						}
+					}
+				},
+				{
+					"name": "Get User Participations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}/participations",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{user_id}}", "participations"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Gyms",
+			"item": [
+				{
+					"name": "Get All Gyms",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/gyms",
+							"host": ["{{base_url}}"],
+							"path": ["gyms"]
+						}
+					}
+				},
+				{
+					"name": "Get Gym By ID",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/gyms/{{gym_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["gyms", "{{gym_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Create Gym (GYM_OWNER)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('gym_id', jsonData._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"PowerFit Studio\",\n  \"description\": \"Salle de sport premium avec equipements modernes\",\n  \"address\": \"42 Avenue Jean Jaures, 69007 Lyon\",\n  \"phone\": \"0472123456\",\n  \"email\": \"contact@powerfit.fr\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gyms",
+							"host": ["{{base_url}}"],
+							"path": ["gyms"]
+						}
+					}
+				},
+				{
+					"name": "Update Gym",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"PowerFit Studio Premium\",\n  \"description\": \"La meilleure salle de Lyon\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gyms/{{gym_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["gyms", "{{gym_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Gym",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/gyms/{{gym_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["gyms", "{{gym_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Approve Gym (ADMIN)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/gyms/{{gym_id}}/approve",
+							"host": ["{{base_url}}"],
+							"path": ["gyms", "{{gym_id}}", "approve"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Exercise Categories",
+			"item": [
+				{
+					"name": "Get All Categories",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/exercise-categories",
+							"host": ["{{base_url}}"],
+							"path": ["exercise-categories"]
+						}
+					}
+				},
+				{
+					"name": "Get Category By ID",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/exercise-categories/{{category_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["exercise-categories", "{{category_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Create Category (ADMIN)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('category_id', jsonData._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Cardio\",\n  \"description\": \"Exercices cardiovasculaires\",\n  \"icon\": \"heart\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/exercise-categories",
+							"host": ["{{base_url}}"],
+							"path": ["exercise-categories"]
+						}
+					}
+				},
+				{
+					"name": "Update Category (ADMIN)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Cardio Training\",\n  \"description\": \"Tous les exercices cardio\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/exercise-categories/{{category_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["exercise-categories", "{{category_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Category (ADMIN)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/exercise-categories/{{category_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["exercise-categories", "{{category_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Equipments",
+			"item": [
+				{
+					"name": "Get All Equipments",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/equipments",
+							"host": ["{{base_url}}"],
+							"path": ["equipments"]
+						}
+					}
+				},
+				{
+					"name": "Get Equipments By Gym",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/equipments?gymId={{gym_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["equipments"],
+							"query": [{ "key": "gymId", "value": "{{gym_id}}" }]
+						}
+					}
+				},
+				{
+					"name": "Get Equipment By ID",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/equipments/{{equipment_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["equipments", "{{equipment_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Create Equipment (GYM_OWNER)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('equipment_id', jsonData._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Treadmill Pro 5000\",\n  \"type\": \"CARDIO\",\n  \"description\": \"Tapis de course professionnel\",\n  \"gymId\": \"{{gym_id}}\",\n  \"quantity\": 5\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/equipments",
+							"host": ["{{base_url}}"],
+							"path": ["equipments"]
+						}
+					}
+				},
+				{
+					"name": "Update Equipment",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"quantity\": 8,\n  \"isAvailable\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/equipments/{{equipment_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["equipments", "{{equipment_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Equipment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/equipments/{{equipment_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["equipments", "{{equipment_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Exercises",
+			"description": "ADMIN only pour creation/modification/suppression. Lecture publique.",
+			"item": [
+				{
+					"name": "Get All Exercises",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/exercises",
+							"host": ["{{base_url}}"],
+							"path": ["exercises"]
+						}
+					}
+				},
+				{
+					"name": "Get Exercises By Category",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/exercises?categoryId={{category_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["exercises"],
+							"query": [{ "key": "categoryId", "value": "{{category_id}}" }]
+						}
+					}
+				},
+				{
+					"name": "Get Exercise By ID",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/exercises/{{exercise_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["exercises", "{{exercise_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Create Exercise (ADMIN)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('exercise_id', jsonData._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Pompes\",\n  \"description\": \"Exercice de musculation au poids du corps\",\n  \"categoryId\": \"{{category_id}}\",\n  \"muscleGroups\": [\"chest\", \"triceps\", \"shoulders\"],\n  \"instructions\": \"Position de planche, descendre le corps en flechissant les bras\",\n  \"exerciseType\": \"strength\",\n  \"difficulty\": \"beginner\",\n  \"equipmentType\": \"bodyweight\",\n  \"visibility\": \"public\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/exercises",
+							"host": ["{{base_url}}"],
+							"path": ["exercises"]
+						}
+					}
+				},
+				{
+					"name": "Update Exercise (ADMIN)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Pompes Diamant\",\n  \"difficulty\": \"intermediate\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/exercises/{{exercise_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["exercises", "{{exercise_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Exercise (ADMIN)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/exercises/{{exercise_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["exercises", "{{exercise_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Workouts",
+			"description": "GYM_OWNER doit specifier gymId. USER cree des workouts prives sans gym.",
+			"item": [
+				{
+					"name": "Get All Workouts",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workouts",
+							"host": ["{{base_url}}"],
+							"path": ["workouts"]
+						}
+					}
+				},
+				{
+					"name": "Get Workout By ID",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workouts/{{workout_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["workouts", "{{workout_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Create Workout (GYM_OWNER avec gym)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('workout_id', jsonData._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Full Body HIIT\",\n  \"description\": \"Entrainement complet haute intensite\",\n  \"difficulty\": \"intermediate\",\n  \"visibility\": \"public\",\n  \"estimatedDuration\": 45,\n  \"categoryId\": \"{{category_id}}\",\n  \"gymId\": \"{{gym_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/workouts",
+							"host": ["{{base_url}}"],
+							"path": ["workouts"]
+						}
+					}
+				},
+				{
+					"name": "Create Workout (USER prive)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('workout_id', jsonData._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Mon entrainement maison\",\n  \"description\": \"Entrainement personnel sans equipement\",\n  \"difficulty\": \"beginner\",\n  \"estimatedDuration\": 30,\n  \"categoryId\": \"{{category_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/workouts",
+							"host": ["{{base_url}}"],
+							"path": ["workouts"]
+						}
+					}
+				},
+				{
+					"name": "Update Workout",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Full Body HIIT Pro\",\n  \"estimatedDuration\": 60\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/workouts/{{workout_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["workouts", "{{workout_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Workout",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workouts/{{workout_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["workouts", "{{workout_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Workout Steps",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workouts/{{workout_id}}/steps",
+							"host": ["{{base_url}}"],
+							"path": ["workouts", "{{workout_id}}", "steps"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Workout Steps",
+			"description": "USER ne peut pas ajouter d'equipement. GYM_OWNER peut utiliser l'equipement de sa gym.",
+			"item": [
+				{
+					"name": "Get Step By ID",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workout-steps/{{step_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["workout-steps", "{{step_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Create Step (sans equipement)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('step_id', jsonData._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"workoutId\": \"{{workout_id}}\",\n  \"exerciseId\": \"{{exercise_id}}\",\n  \"order\": 1,\n  \"stepType\": \"exercise\",\n  \"parameters\": {\n    \"sets\": 3,\n    \"reps\": 12,\n    \"intensity\": \"moderate\"\n  },\n  \"restAfter\": {\n    \"duration\": 60,\n    \"type\": \"passive\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/workout-steps",
+							"host": ["{{base_url}}"],
+							"path": ["workout-steps"]
+						}
+					}
+				},
+				{
+					"name": "Create Step (avec equipement - GYM_OWNER)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('step_id', jsonData._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"workoutId\": \"{{workout_id}}\",\n  \"exerciseId\": \"{{exercise_id}}\",\n  \"equipmentId\": \"{{equipment_id}}\",\n  \"order\": 2,\n  \"stepType\": \"exercise\",\n  \"parameters\": {\n    \"sets\": 4,\n    \"reps\": 10,\n    \"weight\": 50,\n    \"intensity\": \"high\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/workout-steps",
+							"host": ["{{base_url}}"],
+							"path": ["workout-steps"]
+						}
+					}
+				},
+				{
+					"name": "Create Rest Step",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"workoutId\": \"{{workout_id}}\",\n  \"order\": 3,\n  \"stepType\": \"rest\",\n  \"parameters\": {\n    \"duration\": 120\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/workout-steps",
+							"host": ["{{base_url}}"],
+							"path": ["workout-steps"]
+						}
+					}
+				},
+				{
+					"name": "Update Workout Step",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"parameters\": {\n    \"sets\": 4,\n    \"reps\": 15\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/workout-steps/{{step_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["workout-steps", "{{step_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Workout Step",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workout-steps/{{step_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["workout-steps", "{{step_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Workout Sessions",
+			"item": [
+				{
+					"name": "Get All Sessions (ADMIN)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workout-sessions",
+							"host": ["{{base_url}}"],
+							"path": ["workout-sessions"]
+						}
+					}
+				},
+				{
+					"name": "Get My Sessions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workout-sessions/me",
+							"host": ["{{base_url}}"],
+							"path": ["workout-sessions", "me"]
+						}
+					}
+				},
+				{
+					"name": "Get Session By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workout-sessions/{{session_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["workout-sessions", "{{session_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Create Session",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('session_id', jsonData._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"workoutId\": \"{{workout_id}}\",\n  \"sessionDate\": \"2026-01-15\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/workout-sessions",
+							"host": ["{{base_url}}"],
+							"path": ["workout-sessions"]
+						}
+					}
+				},
+				{
+					"name": "Start Session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workout-sessions/{{session_id}}/start",
+							"host": ["{{base_url}}"],
+							"path": ["workout-sessions", "{{session_id}}", "start"]
+						}
+					}
+				},
+				{
+					"name": "Complete Session",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"overallFeeling\": {\n    \"energy\": 8,\n    \"difficulty\": 7,\n    \"satisfaction\": 9,\n    \"notes\": \"Super entrainement!\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/workout-sessions/{{session_id}}/complete",
+							"host": ["{{base_url}}"],
+							"path": ["workout-sessions", "{{session_id}}", "complete"]
+						}
+					}
+				},
+				{
+					"name": "Abandon Session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workout-sessions/{{session_id}}/abandon",
+							"host": ["{{base_url}}"],
+							"path": ["workout-sessions", "{{session_id}}", "abandon"]
+						}
+					}
+				},
+				{
+					"name": "Update Session",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"overallFeeling\": {\n    \"notes\": \"Mise a jour du feedback\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/workout-sessions/{{session_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["workout-sessions", "{{session_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Session (ADMIN)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/workout-sessions/{{session_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["workout-sessions", "{{session_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Challenges",
+			"item": [
+				{
+					"name": "Get All Challenges",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/challenges",
+							"host": ["{{base_url}}"],
+							"path": ["challenges"]
+						}
+					}
+				},
+				{
+					"name": "Get Challenge By ID",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/challenges/{{challenge_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["challenges", "{{challenge_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Create Challenge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('challenge_id', jsonData._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Marathon du mois\",\n  \"description\": \"Parcourez 100km ce mois-ci!\",\n  \"workoutId\": \"{{workout_id}}\",\n  \"startDate\": \"2026-02-01\",\n  \"endDate\": \"2026-03-01\",\n  \"difficulty\": \"INTERMEDIATE\",\n  \"pointsReward\": 500,\n  \"maxParticipants\": 100,\n  \"rankingType\": \"POINTS\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/challenges",
+							"host": ["{{base_url}}"],
+							"path": ["challenges"]
+						}
+					}
+				},
+				{
+					"name": "Update Challenge",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Ultra Marathon Challenge\",\n  \"pointsReward\": 800\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/challenges/{{challenge_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["challenges", "{{challenge_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Challenge",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/challenges/{{challenge_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["challenges", "{{challenge_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Challenge Ranking",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/challenges/{{challenge_id}}/ranking",
+							"host": ["{{base_url}}"],
+							"path": ["challenges", "{{challenge_id}}", "ranking"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Participations",
+			"item": [
+				{
+					"name": "Get All Participations (ADMIN)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/participations",
+							"host": ["{{base_url}}"],
+							"path": ["participations"]
+						}
+					}
+				},
+				{
+					"name": "Get Participation By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/participations/{{participation_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["participations", "{{participation_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Join Challenge",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('participation_id', jsonData._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"challengeId\": \"{{challenge_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/participations",
+							"host": ["{{base_url}}"],
+							"path": ["participations"]
+						}
+					}
+				},
+				{
+					"name": "Submit Score",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"sessionId\": \"{{session_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/participations/{{participation_id}}/submit",
+							"host": ["{{base_url}}"],
+							"path": ["participations", "{{participation_id}}", "submit"]
+						}
+					}
+				},
+				{
+					"name": "Update Participation (ADMIN)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"score\": 1500,\n  \"rank\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/participations/{{participation_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["participations", "{{participation_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Participation",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/participations/{{participation_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["participations", "{{participation_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Badges",
+			"item": [
+				{
+					"name": "Get All Badges",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/badges",
+							"host": ["{{base_url}}"],
+							"path": ["badges"]
+						}
+					}
+				},
+				{
+					"name": "Get Badge By ID",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/badges/{{badge_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["badges", "{{badge_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Create Badge (ADMIN)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('badge_id', jsonData._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Premier Pas\",\n  \"description\": \"Terminez votre premier challenge\",\n  \"icon\": \"trophy\",\n  \"category\": \"ACHIEVEMENT\",\n  \"rarity\": \"COMMON\",\n  \"pointsValue\": 50,\n  \"criteria\": {\n    \"type\": \"CHALLENGES_COMPLETED\",\n    \"value\": 1\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/badges",
+							"host": ["{{base_url}}"],
+							"path": ["badges"]
+						}
+					}
+				},
+				{
+					"name": "Update Badge (ADMIN)",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Debuts Prometteurs\",\n  \"pointsValue\": 75\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/badges/{{badge_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["badges", "{{badge_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Badge (ADMIN)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/badges/{{badge_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["badges", "{{badge_id}}"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}
