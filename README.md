@@ -64,9 +64,11 @@ npm run dev:up
 # Arreter les conteneurs et supprimer les volumes
 npm run down
 
-# Build production
+# Build and start
 npm run build
 npm start
+npm run bs # Build + Start
+```
 
 # Tests
 npm test
