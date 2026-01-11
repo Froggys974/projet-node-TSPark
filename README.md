@@ -2,6 +2,8 @@
 
 API REST Node.js/Express + MongoDB pour la gestion de salles de sport, workouts, challenges et gamification.
 
+**GitHub**: https://github.com/Froggys974/projet-node-TSPark
+
 ## Stack Technique
 
 - Node.js + Express + TypeScript
