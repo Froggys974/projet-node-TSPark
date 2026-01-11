@@ -17,13 +17,14 @@ afterAll(async () => {
 });
 
 describe('Debug User Routes', () => {
-    it('POST /users should create a user or log error', async () => {
+    it('POST /auth/register/user should create a user', async () => {
         const payload = {
-            name: 'debugUser',
-            email: 'debug@example.com',
-            password: 'password123'
+            firstName: 'Debug',
+            lastName: 'User',
+            email: `debug_${Date.now()}@example.com`,
+            password: 'Test@1234'
         };
-        const res = await request(app).post('/users').send(payload);
+        const res = await request(app).post('/auth/register/user').send(payload);
         if (res.status !== 201) {
             console.log("DEBUG ERROR RESPONSE:", JSON.stringify(res.body, null, 2));
             console.log("DEBUG STATUS:", res.status);
