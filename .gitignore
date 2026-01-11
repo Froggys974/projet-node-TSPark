@@ -25,5 +25,11 @@ dist/
 build/
 *.log
 
+# Compiled test files
+tests/**/*.js
+tests/**/*.js.map
+tests/**/*.d.ts
+tests/**/*.d.ts.map
+
 # Docker
 .docker/
