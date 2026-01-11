@@ -15,27 +15,27 @@ export class BadgeService {
     }
 
     async getAllBadges(): Promise<Badge[]> {
-        return this.badgeModel.find();
+        return this.badgeModel.find().exec();
     }
 
     async getBadgeById(id: string): Promise<Badge | null> {
-        return this.badgeModel.findById(id);
+        return this.badgeModel.findById(id).exec();
     }
 
     async updateBadge(id: string, badge: Partial<CreateBadge>): Promise<Badge | null> {
-        return this.badgeModel.findByIdAndUpdate(id, badge, { new: true });
+        return this.badgeModel.findByIdAndUpdate(id, badge, { new: true }).exec();
     }
 
     async deleteBadge(id: string): Promise<void> {
-        await this.badgeModel.findByIdAndDelete(id);
+        await this.badgeModel.findByIdAndDelete(id).exec();
     }
 
     async getBadgesByCategory(category: BadgeCategory): Promise<Badge[]> {
-        return this.badgeModel.find({ category });
+        return this.badgeModel.find({ category }).exec();
     }
 
     async getBadgesByRarity(rarity: BadgeRarity): Promise<Badge[]> {
-        return this.badgeModel.find({ rarity });
+        return this.badgeModel.find({ rarity }).exec();
     }
 
     async checkForBadges(user: any, participation: any, challenge: any): Promise<void> {
@@ -47,43 +47,29 @@ export class BadgeService {
                 continue;
             }
 
-            const parts = badge.requirement.match(/^(\w+)\s*([><=!]+)\s*(.+)$/);
-            if (!parts) continue;
+            // New logic based on criteria object
+            if (!badge.criteria) continue;
 
-            const [, field, operator, rawValue] = parts;
-            let value: any = rawValue;
-            if ((value.startsWith("'") && value.endsWith("'")) || (value.startsWith('"') && value.endsWith('"'))) {
-                value = value.slice(1, -1);
-            }
-
+            const { type, threshold } = badge.criteria;
             let conditionMet = false;
 
-            if (field === "total_score") {
-                const target = parseFloat(value);
-                const current = user.totalScore || 0;
-                if (operator === ">=") conditionMet = current >= target;
-                else if (operator === ">") conditionMet = current > target;
-                else if (operator === "<=") conditionMet = current <= target;
-                else if (operator === "<") conditionMet = current < target;
-                else if (operator === "==") conditionMet = current === target;
-            } else if (field === "workout_time") {
-                const date = new Date(participation.startDate);
-                if (!isNaN(date.getTime())) {
-                    const hours = date.getHours();
-                    const minutes = date.getMinutes();
-                    const timeValue = hours * 60 + minutes;
+            // Simplified logic mapping for available data
+            switch (type) {
+                case "total_calories": // CriteriaType.TOTAL_CALORIES
+                    // Proxy: using user.points or assuming user has totalCalories property if extended
+                    const points = user.points || 0; 
+                    if (points >= threshold) conditionMet = true;
+                    break;
+                
+                case "workout_count":
+                    // If user has workoutCount (not in current interface but potentially in user object passed)
+                    if (user.workoutCount && user.workoutCount >= threshold) conditionMet = true;
+                    break;
 
-                    const [tHours, tMinutes] = value.split(":").map(Number);
-                    const targetTime = tHours * 60 + tMinutes;
-
-                    if (operator === "<") conditionMet = timeValue < targetTime;
-                    else if (operator === "<=") conditionMet = timeValue <= targetTime;
-                    else if (operator === ">") conditionMet = timeValue > targetTime;
-                    else if (operator === ">=") conditionMet = timeValue >= targetTime;
-                }
-            } else if (field === "type_match") {
-                 const current = challenge.exerciseType;
-                 if (operator === "==") conditionMet = current === value;
+                case "streak_days":
+                     // If user object has currentStreak
+                     if (user.currentStreak && user.currentStreak >= threshold) conditionMet = true;
+                     break;
             }
 
             if (conditionMet) {

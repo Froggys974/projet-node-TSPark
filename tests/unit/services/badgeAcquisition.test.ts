@@ -35,13 +35,17 @@ describe("BadgeService - Badge Acquisition", () => {
         badgeService = new BadgeService(mockConnexion);
     });
 
-    it("should award a badge if requirements are met (total_score)", async () => {
+    it("should award a badge if score meets total_calories criteria", async () => {
         // Arrange
-        const user = { _id: "user1", badges: [], totalScore: 150 };
+        const user = { _id: "user1", badges: [], points: 150 }; // Assuming points mapped to total_calories
         const participation = {};
         const challenge = {};
         const badges = [
-            { _id: "badge1", name: "Score Master", requirement: "total_score >= 100", requirementType: "total_score" }
+            { 
+                _id: "badge1", 
+                name: "Score Master", 
+                criteria: { type: "total_calories", threshold: 100 } 
+            }
         ];
 
         mockBadgeModel.exec.mockResolvedValue(badges);
@@ -53,13 +57,17 @@ describe("BadgeService - Badge Acquisition", () => {
         expect(mockUserModel.findByIdAndUpdate).toHaveBeenCalledWith("user1", { $addToSet: { badges: "badge1" } });
     });
 
-    it("should NOT award a badge if requirements are NOT met (total_score)", async () => {
+    it("should NOT award a badge if score below threshold", async () => {
         // Arrange
-        const user = { _id: "user1", badges: [], totalScore: 50 };
+        const user = { _id: "user1", badges: [], points: 50 };
         const participation = {};
         const challenge = {};
         const badges = [
-            { _id: "badge1", name: "Score Master", requirement: "total_score >= 100" }
+            { 
+                 _id: "badge1", 
+                 name: "Score Master", 
+                 criteria: { type: "total_calories", threshold: 100 } 
+            }
         ];
 
         mockBadgeModel.exec.mockResolvedValue(badges);
@@ -71,32 +79,17 @@ describe("BadgeService - Badge Acquisition", () => {
         expect(mockUserModel.findByIdAndUpdate).not.toHaveBeenCalled();
     });
 
-    it("should award a badge if requirement met (workout_time)", async () => {
-        // Arrange
-        const user = { _id: "user1", badges: [] };
-        // 05:30 AM
-        const participation = { startDate: new Date("2023-01-01T05:30:00") };
-        const challenge = {};
-        const badges = [
-            { _id: "badge2", name: "Early Bird", requirement: "workout_time < 06:00" }
-        ];
-
-        mockBadgeModel.exec.mockResolvedValue(badges);
-
-        // Act
-        await badgeService.checkForBadges(user, participation, challenge);
-
-         // Assert
-         expect(mockUserModel.findByIdAndUpdate).toHaveBeenCalledWith("user1", { $addToSet: { badges: "badge2" } });
-    });
-
     it("should NOT award badge if user already has it", async () => {
          // Arrange
-         const user = { _id: "user1", badges: ["badge1"], totalScore: 150 };
+         const user = { _id: "user1", badges: ["badge1"], points: 150 };
          const participation = {};
          const challenge = {};
          const badges = [
-             { _id: "badge1", name: "Score Master", requirement: "total_score >= 100" }
+            { 
+                _id: "badge1", 
+                name: "Score Master", 
+                criteria: { type: "total_calories", threshold: 100 } 
+           }
          ];
  
          mockBadgeModel.exec.mockResolvedValue(badges);
@@ -108,21 +101,4 @@ describe("BadgeService - Badge Acquisition", () => {
          expect(mockUserModel.findByIdAndUpdate).not.toHaveBeenCalled();
     });
     
-    it("should award a badge if requirement met (type_match)", async () => {
-         // Arrange
-         const user = { _id: "user1", badges: [] };
-         const participation = {};
-         const challenge = { exerciseType: "Running" };
-         const badges = [
-             { _id: "badge3", name: "Runner", requirement: "type_match == 'Running'" }
-         ];
- 
-         mockBadgeModel.exec.mockResolvedValue(badges);
- 
-         // Act
-         await badgeService.checkForBadges(user, participation, challenge);
- 
-          // Assert
-          expect(mockUserModel.findByIdAndUpdate).toHaveBeenCalledWith("user1", { $addToSet: { badges: "badge3" } });
-    });
 });

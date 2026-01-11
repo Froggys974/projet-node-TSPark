@@ -6,7 +6,6 @@ import mongoose from 'mongoose';
 let app: any;
 
 beforeAll(async () => {
-    // Connect to DB directly
     if (mongoose.connection.readyState === 0) {
         await mongoose.connect(process.env.MONGO_URI_TEST || "mongodb://localhost:27017/test_db");
     }
