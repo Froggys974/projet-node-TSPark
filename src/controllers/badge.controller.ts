@@ -1,13 +1,32 @@
 import { Request, Response, Router } from "express";
 import { BadgeService } from "../services";
+import { AuthMiddleware } from "../middlewares";
+import { UserRole, BadgeCategory, BadgeRarity } from "../types";
 
 export class BadgeController {
 
-    constructor(private readonly badgeService: BadgeService) {}
+    constructor(
+        private readonly badgeService: BadgeService,
+        private readonly authMiddleware: AuthMiddleware
+    ) {}
 
     async getAllBadges(req: Request, res: Response): Promise<void> {
-        const badges = await this.badgeService.getAllBadges();
-        res.status(200).json(badges);
+        try {
+            const { category, rarity } = req.query;
+            let badges;
+
+            if (category) {
+                badges = await this.badgeService.getBadgesByCategory(category as BadgeCategory);
+            } else if (rarity) {
+                badges = await this.badgeService.getBadgesByRarity(rarity as BadgeRarity);
+            } else {
+                badges = await this.badgeService.getAllBadges();
+            }
+
+            res.status(200).json(badges);
+        } catch (error: any) {
+            res.status(500).json({ message: error.message });
+        }
     }
 
     async getBadgeById(req: Request, res: Response): Promise<void> {
@@ -55,14 +74,25 @@ export class BadgeController {
         res.status(204).end();
     }
 
-    buildRouter() : Router{
+    buildRouter(): Router {
         const router = Router();
+
         router.get("/", this.getAllBadges.bind(this));
         router.get("/:id", this.getBadgeById.bind(this));
-        router.post("/", this.createBadge.bind(this));
-        router.put("/:id", this.updateBadge.bind(this));
-        router.delete("/:id", this.deleteBadge.bind(this));
+
+        router.post("/",
+            this.authMiddleware.authorize(UserRole.ADMIN),
+            this.createBadge.bind(this)
+        );
+        router.put("/:id",
+            this.authMiddleware.authorize(UserRole.ADMIN),
+            this.updateBadge.bind(this)
+        );
+        router.delete("/:id",
+            this.authMiddleware.authorize(UserRole.ADMIN),
+            this.deleteBadge.bind(this)
+        );
+
         return router;
     }
-
 }

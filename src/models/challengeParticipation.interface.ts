@@ -1,15 +1,14 @@
-import { GymOwner } from "./gymOwner.interface";
-import { User } from "./user.interface";
+import { Types } from "mongoose";
+import { IChallengeParticipation } from "../types";
 
-export type CreateChallengeParticipation = Omit<ChallengeParticipation, "_id">;
+export type ChallengeParticipation = IChallengeParticipation;
 
-export interface ChallengeParticipation{
-    _id: string;
-    user: User;
-    challengeId: string;
-    gymOwner?: GymOwner;
-    startDate: Date;
-    endDate?: Date;
-    status: string;
-    progressValue?: number;
+export interface CreateChallengeParticipation {
+    challengeId: Types.ObjectId | string;
+    userId: Types.ObjectId | string;
+    sessionId: Types.ObjectId | string;
+    score: number;
+    rank?: number;
+    pointsEarned?: number;
+    completedAt?: Date;
 }

@@ -1,15 +1,23 @@
-export type CreateChallenge = Omit<Challenge, "_id">;
+import { Types } from "mongoose";
+import { IChallenge, RankingType, Visibility } from "../types";
 
-export interface Challenge{
-    _id: string;
+export type Challenge = IChallenge;
+
+export interface CreateChallenge {
+    workoutId: Types.ObjectId | string;
+    creatorId: Types.ObjectId | string;
+    gymId?: Types.ObjectId | string;
     title: string;
-    description: string;
-    exerciseType: string;
-    targetValue: number;
-    trainingRoomId?: string;
-    creatorId: string;
+    description?: string;
+    rankingType: RankingType;
     startDate: Date;
     endDate: Date;
-    difficulty?: string;
-    rewardPoints?: number;
+    pointsReward: {
+        first: number;
+        second: number;
+        third: number;
+        participation: number;
+    };
+    visibility: Visibility;
+    isActive?: boolean;
 }
