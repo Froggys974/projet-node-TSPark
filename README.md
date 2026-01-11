@@ -5,9 +5,10 @@ API REST Node.js/Express + MongoDB pour la gestion de salles de sport, workouts,
 ## Stack Technique
 
 - Node.js + Express + TypeScript
-- MongoDB + Mongoose
+- MongoDB + Mongoose (via Docker)
 - JWT Authentication (jsonwebtoken)
 - bcrypt password hashing
+- Docker pour la containerisation
 
 ## Installation
 
@@ -30,6 +31,27 @@ ADMIN_DEFAULT_PASSWORD=Admin123!
 **Admin par defaut**: Au premier lancement (base vide), un admin est cree automatiquement:
 - Email: `admin@fitnesspark.com`
 - Password: valeur de `ADMIN_DEFAULT_PASSWORD` ou `Admin123!`
+
+## Docker
+
+**MongoDB en Docker**: La base MongoDB est containerisée avec Docker pour simplifier le setup :
+
+```bash
+# Demarrer MongoDB + API en developpement
+npm run dev:up
+# -> Lance le conteneur MongoDB et l'API Node.js
+# -> La base MongoDB est accessible sur mongodb://localhost:27017
+
+# Arreter et nettoyer
+npm run down
+# -> Arrete les conteneurs et supprime les volumes MongoDB
+```
+
+**Configuration Docker**: Le fichier `docker-compose.yaml` defini le service MongoDB avec :
+- Image officielle MongoDB
+- Port expose: `27017`
+- Volume persiste pour les donnees
+- Variables d'environnement preconfigurées
 
 ## Lancement
 
@@ -61,7 +83,7 @@ Fichier de configuration : `.github/workflows/test.yml`
 ## Methologie de Developpement
 
 Le projet suit un **GitHub Flow** strict :
-- Chaque feature/amelioration est developpee sur une branche dedicace (`feature/xxx`, `fix/xxx`, `improvement/xxx`, etc.)
+- Chaque feature/amelioration est developpee sur une nouvelle branche
 - Les changements sont integres via Pull Requests avec CI automatique
 - Fusion vers `develop` pour l'integration, puis `main` pour la production
 
@@ -288,6 +310,104 @@ DELETE /badges/:id                Supprimer badge
 
 ### Gender
 `MALE`, `FEMALE`, `OTHER`
+
+## Use Cases - Exemples d'Utilisation
+
+### 1. ADMIN - Gerer la Plateforme Complète
+
+**Scenario**: Un administrateur gere et controle toute la plateforme. L'ADMIN a **TOUS les pouvoirs** incluant ceux des GYM_OWNER.
+
+```
+1. ADMIN se connecte (POST /auth/login/admin)
+
+2. Gere le contenu officiel:
+   - Cree les ExerciseCategories (POST /exercise-categories)
+   - Ajoute les exercises officiels (POST /exercises)
+     (Pompes, Squats, Courses, etc.)
+   - Cree et gere les badges (POST /badges)
+
+3. Gere les salles:
+   - Approuve/rejette les salles en attente (POST /gyms/:id/approve, POST /gyms/:id/reject)
+   - Peut modifier/supprimer n'importe quelle salle (PUT/DELETE /gyms/:id)
+   - Peut ajouter des equipements a n'importe quelle salle
+   
+4. Gere les users:
+   - Consulte tous les users (GET /users)
+   - Active/desactive les comptes (POST /users/:id/activate, /deactivate)
+   - Modifie les informations de n'importe quel user
+
+5. Gere les challenges et workouts:
+   - Peut creer/modifier/supprimer n'importe quel challenge
+   - Peut creer/modifier/supprimer n'importe quel workout (meme ceux des autres)
+   - Peut moderer les participations aux challenges
+
+6. Acces complet en lecture:
+   - Voir toutes les sessions d'entrainement
+   - Voir tous les classements et participations
+   - Consulter les statistiques completes
+```
+
+**Classes impliquees**:
+- `UserService` : Gestion complete des users et activation
+- `GymService` : Approbation et gestion de toutes les salles
+- `ExerciseCategoryService` : Creation des categories
+- `ExerciseService` : Creation des exercises officiels
+- `BadgeService` : Gestion des badges
+- `EquipmentService` : Gestion complete de tous les equipements (toutes salles)
+- `WorkoutService` : Modification de tous les workouts
+- `ChallengeService` : Creation et moderation des defis
+- `WorkoutSessionService` : Consultation de toutes les sessions
+
+---
+
+### 2. GYM_OWNER - Creer une Salle et ses Programmes
+
+**Scenario**: Un proprietaire de salle veut setup sa salle avec equipement et programmes.
+
+```
+1. GYM_OWNER se connecte (POST /auth/login/gym-owner)
+2. Cree sa salle (POST /gyms)
+3. Ajoute des equipements (POST /equipments)
+   - Chaque equipement est lie a sa salle (gymId)
+4. Cree des workouts avec equipement (POST /workouts)
+   - Specifie son gymId
+   - Peut inclure les equipements de sa salle
+5. Creer des challenges pour les members (POST /challenges)
+   - Les users peuvent participer (POST /participations)
+6. Suit les participations des users (GET /participations?challengeId=xxx)
+```
+
+**Classes impliquees**:
+- `GymService` : Gestion des salles
+- `EquipmentService` : Gestion des equipements par salle
+- `WorkoutService` : Workouts avec gymId
+- `ChallengeService` : Creation et gestion des defis
+- `ChallengeParticipationService` : Suivi des participants
+
+---
+
+### 3. User Standard - Creer un Workout Privé
+
+**Scenario**: Un utilisateur veut creer un programme d'entrainement personnel.
+
+```
+1. USER se connecte (POST /auth/login)
+2. Recupere la liste des exercises (GET /exercises)
+3. Cree un workout PRIVE (POST /workouts)
+   - Sans gymId (workout automatiquement prive)
+   - Selectionnne les exercices souhaitees
+4. Ajoute des steps au workout (POST /workout-steps)
+5. Cree une session d'entrainement (POST /workout-sessions)
+6. Demarre la session (POST /workout-sessions/:id/start)
+7. Termine et voit les calories brulees (POST /workout-sessions/:id/complete)
+```
+
+**Classes impliquees**: 
+- `UserService` : Gestion du profil utilisateur
+- `WorkoutService` : CRUD des workouts
+- `WorkoutStepService` : Gestion des etapes
+- `WorkoutSessionService` : Suivi des entrainements et calcul calories
+
 
 ## Postman
 
