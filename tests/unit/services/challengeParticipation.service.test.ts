@@ -7,21 +7,19 @@ describe("ChallengeParticipationService", () => {
     let mockModel: any;
 
     beforeEach(() => {
-        // Mock chainable methods
-        const mockExec = jest.fn();
-        const mockPopulate = jest.fn().mockReturnThis(); // Returns itself to allow chaining if needed, or we can control it better
-        // Actually populate returns the query, so it should have exec
         const mockQuery = {
-            exec: mockExec,
-            populate: mockPopulate,
+            sort: jest.fn().mockReturnThis(),
+            populate: jest.fn().mockReturnThis(),
+            limit: jest.fn().mockReturnThis(),
         };
 
         mockModel = {
             create: jest.fn(),
             find: jest.fn().mockReturnValue(mockQuery),
-            findOne: jest.fn().mockReturnValue(mockQuery),
-            findByIdAndUpdate: jest.fn().mockReturnValue(mockQuery),
-            findByIdAndDelete: jest.fn().mockReturnValue(mockQuery),
+            findById: jest.fn(),
+            findOne: jest.fn(),
+            findByIdAndUpdate: jest.fn(),
+            findByIdAndDelete: jest.fn(),
         };
 
         mockMongoose = {
@@ -37,7 +35,7 @@ describe("ChallengeParticipationService", () => {
 
     describe("createChallengeParticipation", () => {
         it("should create a challenge participation", async () => {
-            const data: any = { challengeId: "1", userId: "user1" };
+            const data: any = { challengeId: "1", userId: "user1", score: 100 };
             mockModel.create.mockResolvedValue(data);
 
             const result = await service.createChallengeParticipation(data);
@@ -49,8 +47,8 @@ describe("ChallengeParticipationService", () => {
 
     describe("getAllChallengeParticipations", () => {
         it("should return all challenge participations", async () => {
-            const data = [{ id: "1" }, { id: "2" }];
-            (mockModel.find().exec as jest.Mock).mockResolvedValue(data);
+            const data = [{ id: "1", score: 100 }, { id: "2", score: 95 }];
+            mockModel.find.mockResolvedValue(data);
 
             const result = await service.getAllChallengeParticipations();
 
@@ -61,12 +59,12 @@ describe("ChallengeParticipationService", () => {
 
     describe("getChallengeParticipationById", () => {
         it("should return a challenge participation by id", async () => {
-            const data = { id: "1" };
-            (mockModel.findOne().exec as jest.Mock).mockResolvedValue(data);
+            const data = { id: "1", score: 100 };
+            mockModel.findById.mockResolvedValue(data);
 
             const result = await service.getChallengeParticipationById("1");
 
-            expect(mockModel.findOne).toHaveBeenCalledWith({ _id: "1" });
+            expect(mockModel.findById).toHaveBeenCalledWith("1");
             expect(result).toEqual(data);
         });
     });
@@ -74,9 +72,9 @@ describe("ChallengeParticipationService", () => {
     describe("updateChallengeParticipation", () => {
         it("should update a challenge participation", async () => {
             const id = "1";
-            const updateData: any = { status: "completed" };
+            const updateData: any = { score: 150 };
             const updatedData = { id: "1", ...updateData };
-            (mockModel.findByIdAndUpdate().exec as jest.Mock).mockResolvedValue(updatedData);
+            mockModel.findByIdAndUpdate.mockResolvedValue(updatedData);
 
             const result = await service.updateChallengeParticipation(id, updateData);
 
@@ -88,7 +86,7 @@ describe("ChallengeParticipationService", () => {
     describe("deleteChallengeParticipation", () => {
         it("should delete a challenge participation", async () => {
             const id = "1";
-            (mockModel.findByIdAndDelete().exec as jest.Mock).mockResolvedValue(null);
+            mockModel.findByIdAndDelete.mockResolvedValue(null);
 
             await service.deleteChallengeParticipation(id);
 
@@ -96,47 +94,86 @@ describe("ChallengeParticipationService", () => {
         });
     });
 
-    describe("getParticipationsForGymOwner", () => {
-        it("should return participations for a gym owner", async () => {
-            const gymOwnerId = "owner1";
-            const data = [{ id: "1", gymOwner: gymOwnerId }];
-            (mockModel.find().populate().exec as jest.Mock).mockResolvedValue(data);
+    describe("getParticipationsByChallenge", () => {
+        it("should return participations for a challenge", async () => {
+            const challengeId = "1";
+            const data = [{ id: "1", score: 100 }];
+            const mockQuery = {
+                sort: jest.fn().mockReturnValue(Promise.resolve(data)),
+            };
+            mockModel.find.mockReturnValue(mockQuery);
 
-            const result = await service.getParticipationsForGymOwner(gymOwnerId);
+            const result = await service.getParticipationsByChallenge(challengeId);
 
-            expect(mockModel.find).toHaveBeenCalledWith({ gymOwner: gymOwnerId });
-            expect(mockModel.find().populate).toHaveBeenCalledWith("gymOwner");
+            expect(mockModel.find).toHaveBeenCalledWith({ challengeId });
             expect(result).toEqual(data);
         });
     });
 
-    describe("getParticipationsForUser", () => {
+    describe("getParticipationsByUser", () => {
         it("should return participations for a user", async () => {
             const userId = "user1";
-            const data = [{ id: "1", user: userId }];
-            (mockModel.find().populate().exec as jest.Mock).mockResolvedValue(data);
+            const data = [{ id: "1", userId, score: 100 }];
+            const mockQuery = {
+                populate: jest.fn().mockResolvedValue(data),
+            };
+            mockModel.find.mockReturnValue(mockQuery);
 
-            const result = await service.getParticipationsForUser(userId);
+            const result = await service.getParticipationsByUser(userId);
 
-            expect(mockModel.find).toHaveBeenCalledWith({ user: userId });
-            expect(mockModel.find().populate).toHaveBeenCalledWith("user");
+            expect(mockModel.find).toHaveBeenCalledWith({ userId });
             expect(result).toEqual(data);
         });
     });
 
-    describe("getParticipationsForChallengeForDate", () => {
-        it("should return participation for a challenge regarding a date", async () => {
+    describe("getUserParticipationInChallenge", () => {
+        it("should return a user's participation in a challenge", async () => {
+            const userId = "user1";
             const challengeId = "challenge1";
-            const date = new Date("2023-01-01");
-            const data = { id: "1", challengeId, startDate: date };
-            (mockModel.findOne().exec as jest.Mock).mockResolvedValue(data);
+            const data = { id: "1", userId, challengeId, score: 100 };
+            mockModel.findOne.mockResolvedValue(data);
 
-            const result = await service.getParticipationsForChallengeForDate(challengeId, date);
+            const result = await service.getUserParticipationInChallenge(userId, challengeId);
 
-            expect(mockModel.findOne).toHaveBeenCalledWith({
-                challengeId: challengeId,
-                startDate: date
-            });
+            expect(mockModel.findOne).toHaveBeenCalledWith({ userId, challengeId });
+            expect(result).toEqual(data);
+        });
+    });
+
+    describe("updateRankings", () => {
+        it("should update rankings for a challenge", async () => {
+            const challengeId = "challenge1";
+            const participations = [
+                { _id: "1", score: 100 },
+                { _id: "2", score: 90 },
+            ];
+            const mockQuery = {
+                sort: jest.fn().mockResolvedValue(participations),
+            };
+            mockModel.find.mockReturnValue(mockQuery);
+            mockModel.findByIdAndUpdate.mockResolvedValue({});
+
+            await service.updateRankings(challengeId);
+
+            expect(mockModel.find).toHaveBeenCalledWith({ challengeId });
+            expect(mockModel.findByIdAndUpdate).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    describe("getTopParticipants", () => {
+        it("should return top participants for a challenge", async () => {
+            const challengeId = "challenge1";
+            const data = [{ id: "1", score: 100 }];
+            const mockQuery = {
+                sort: jest.fn().mockReturnThis(),
+                limit: jest.fn().mockReturnThis(),
+                populate: jest.fn().mockResolvedValue(data),
+            };
+            mockModel.find.mockReturnValue(mockQuery);
+
+            const result = await service.getTopParticipants(challengeId, 10);
+
+            expect(mockModel.find).toHaveBeenCalledWith({ challengeId });
             expect(result).toEqual(data);
         });
     });

@@ -1,8 +1,6 @@
 import { Model, Mongoose } from "mongoose";
-import { ChallengeParticipation } from "../../../models";
+import { ChallengeParticipation, CreateChallengeParticipation } from "../../../models";
 import { getChallengeParticipationSchema } from "../schema";
-
-export type CreateChallengeParticipation = Omit<ChallengeParticipation, "_id">;
 
 export class ChallengeParticipationService {
     readonly challengeParticipationModel: Model<ChallengeParticipation>;
@@ -11,44 +9,64 @@ export class ChallengeParticipationService {
         this.challengeParticipationModel = connexion.model("ChallengeParticipation", getChallengeParticipationSchema());
     }
 
-    async createChallengeParticipation(challengeParticipation: CreateChallengeParticipation): Promise<ChallengeParticipation> {
-        return this.challengeParticipationModel.create(challengeParticipation);
+    async createChallengeParticipation(participation: CreateChallengeParticipation): Promise<ChallengeParticipation> {
+        return this.challengeParticipationModel.create(participation);
     }
 
     async getAllChallengeParticipations(): Promise<ChallengeParticipation[]> {
-        return this.challengeParticipationModel.find().exec();
+        return this.challengeParticipationModel.find();
     }
 
     async getChallengeParticipationById(id: string): Promise<ChallengeParticipation | null> {
-        return this.challengeParticipationModel.findOne({ _id: id }).exec();
+        return this.challengeParticipationModel.findById(id);
     }
 
-    async updateChallengeParticipation(id: string, challengeParticipation: CreateChallengeParticipation): Promise<ChallengeParticipation | null> {
-        return this.challengeParticipationModel.findByIdAndUpdate(id, challengeParticipation, { new: true }).exec();
+    async updateChallengeParticipation(id: string, participation: Partial<CreateChallengeParticipation>): Promise<ChallengeParticipation | null> {
+        return this.challengeParticipationModel.findByIdAndUpdate(id, participation, { new: true });
     }
 
     async deleteChallengeParticipation(id: string): Promise<void> {
-        await this.challengeParticipationModel.findByIdAndDelete(id).exec();
+        await this.challengeParticipationModel.findByIdAndDelete(id);
     }
-    async getParticipationsForGymOwner(gymOwnerId: string): Promise<ChallengeParticipation[]> {
-        return this.challengeParticipationModel
-            .find({ gymOwner: gymOwnerId })
-            .populate("gymOwner")
-            .exec();
-    }
-    async getParticipationsForUser(userId: string): Promise<ChallengeParticipation[]> {
-        return this.challengeParticipationModel
-            .find({ user: userId })
-            .populate("user")
-            .exec();
-    }
-    async getParticipationsForChallengeForDate(challengeId: string, date: Date): Promise<ChallengeParticipation | null> {
-        return this.challengeParticipationModel
-            .findOne({
-                challengeId: challengeId,
-                startDate: date
-            })
-            .exec();
 
+    async getParticipationsByChallenge(challengeId: string): Promise<ChallengeParticipation[]> {
+        return this.challengeParticipationModel
+            .find({ challengeId })
+            .sort({ score: -1 });
+    }
+
+    async getParticipationsByUser(userId: string): Promise<ChallengeParticipation[]> {
+        return this.challengeParticipationModel
+            .find({ userId })
+            .populate("challengeId");
+    }
+
+    async getUserParticipationInChallenge(userId: string, challengeId: string): Promise<ChallengeParticipation | null> {
+        return this.challengeParticipationModel
+            .findOne({ userId, challengeId });
+    }
+
+    async updateRankings(challengeId: string): Promise<void> {
+        const participations = await this.challengeParticipationModel
+            .find({ challengeId })
+            .sort({ score: -1 });
+
+        for (let i = 0; i < participations.length; i++) {
+            const participation = participations[i];
+            if (participation) {
+                await this.challengeParticipationModel.findByIdAndUpdate(
+                    participation._id,
+                    { rank: i + 1 }
+                );
+            }
         }
+    }
+
+    async getTopParticipants(challengeId: string, limit: number = 10): Promise<ChallengeParticipation[]> {
+        return this.challengeParticipationModel
+            .find({ challengeId })
+            .sort({ score: -1 })
+            .limit(limit)
+            .populate("userId");
+    }
 }

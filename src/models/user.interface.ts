@@ -1,11 +1,21 @@
-export type CreateUser = Omit<User, "_id">;
+import { Types } from "mongoose";
+import { IUser, UserRole, Gender } from "../types";
 
-export interface User{
-    _id: string;
-    name: string;
+export type User = IUser;
+
+export interface CreateUser {
     email: string;
-    birthdate?: Date;
-    fitnessLevel?: string;
-    badges?: string[];
-    totalScore?: number;
+    password: string;
+    firstName: string;
+    lastName: string;
+    role: UserRole;
+    avatar?: string;
+    dateOfBirth?: Date;
+    gender?: Gender;
+    address?: string;
+    points: number;
+    level: number;
+    badges: Types.ObjectId[] | string[];
+    isActive: boolean;
+    isVerified: boolean;
 }
