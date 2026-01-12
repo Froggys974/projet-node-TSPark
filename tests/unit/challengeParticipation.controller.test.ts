@@ -2,7 +2,6 @@ import { ChallengeParticipationController } from "../../src/controllers/challeng
 import { ChallengeParticipationService, GymOwnerService } from "../../src/services";
 import { Request, Response } from "express";
 
-// Mock the services
 const mockChallengeParticipationService = {
   createChallengeParticipation: jest.fn(),
   getParticipationsForChallengeForDate: jest.fn(),
@@ -37,7 +36,6 @@ describe("ChallengeParticipationController", () => {
 
   describe("createChallengeParticipation", () => {
     it("should return 400 if a participation already exists for the same challenge and date", async () => {
-      // Arrange
       const commonDate = new Date("2023-10-10");
       req = {
         body: {
@@ -47,38 +45,32 @@ describe("ChallengeParticipationController", () => {
         },
       };
 
-      // Mock GymOwner found
       (mockGymOwnerService.getGymOwnerById as jest.Mock).mockResolvedValue({ _id: "gymOwner123" });
 
-      // Mock Participation FOUND (Conflict)
       (mockChallengeParticipationService.getParticipationsForChallengeForDate as jest.Mock).mockResolvedValue({
         _id: "existingPart123",
       });
 
-      // Act
       await controller.createChallengeParticipation(
         req as Request,
         res as Response
       );
 
-      // Assert
       expect(mockGymOwnerService.getGymOwnerById).toHaveBeenCalledWith("gymOwner123");
       expect(
         mockChallengeParticipationService.getParticipationsForChallengeForDate
-      ).toHaveBeenCalledWith("challenge123", expect.any(Date)); // Note: Depending on implementation, might need strict date check
+      ).toHaveBeenCalledWith("challenge123", expect.any(Date));
       
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         message: "Une participation existe déjà pour ce défi à cette date.",
       });
-      // Should NOT create
       expect(
         mockChallengeParticipationService.createChallengeParticipation
       ).not.toHaveBeenCalled();
     });
 
     it("should create participation if no conflict exists", async () => {
-         // Arrange
       const commonDate = new Date("2023-10-12");
       req = {
         body: {
@@ -88,23 +80,18 @@ describe("ChallengeParticipationController", () => {
         },
       };
 
-      // Mock GymOwner found
       (mockGymOwnerService.getGymOwnerById as jest.Mock).mockResolvedValue({ _id: "gymOwner123" });
 
-      // Mock Participation NOT FOUND
       (mockChallengeParticipationService.getParticipationsForChallengeForDate as jest.Mock).mockResolvedValue(null);
 
-      // Mock Create Success
       const newParticipation = { _id: "newPart123", ...req.body };
       (mockChallengeParticipationService.createChallengeParticipation as jest.Mock).mockResolvedValue(newParticipation);
 
-      // Act
       await controller.createChallengeParticipation(
         req as Request,
         res as Response
       );
 
-      // Assert
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith(newParticipation);
     });

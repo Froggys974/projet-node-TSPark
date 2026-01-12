@@ -2,7 +2,6 @@ import { BadgeController } from "../../src/controllers/badge.controller";
 import { BadgeService } from "../../src/services";
 import { Request, Response } from "express";
 
-// Mock Service
 const mockBadgeService = {
   getAllBadges: jest.fn(),
   getBadgeById: jest.fn(),

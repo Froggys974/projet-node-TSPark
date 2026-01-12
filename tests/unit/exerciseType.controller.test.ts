@@ -2,7 +2,6 @@ import { ExerciseTypeController } from "../../src/controllers/exerciseType.contr
 import { ExerciseTypeService } from "../../src/services";
 import { Request, Response } from "express";
 
-// Mock Service
 const mockExerciseTypeService = {
   getAllExerciseTypes: jest.fn(),
   getExerciseTypeById: jest.fn(),

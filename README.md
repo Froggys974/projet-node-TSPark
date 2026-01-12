@@ -56,7 +56,7 @@ Les tests sont situés dans le dossier `tests/` à la racine du projet qui miroi
 
 ```
 tests/
-└── unit/                       # Tests unitaires
+└── unit/
     └── challengeParticipation.controller.test.ts
 ```
 

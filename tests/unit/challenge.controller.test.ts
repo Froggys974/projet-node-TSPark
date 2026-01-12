@@ -2,7 +2,6 @@ import { ChallengeController } from "../../src/controllers/challenge.controller"
 import { ChallengeService } from "../../src/services";
 import { Request, Response } from "express";
 
-// Mock du service
 const mockChallengeService = {
   getAllChallenges: jest.fn(),
   getChallengeById: jest.fn(),

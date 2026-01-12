@@ -2,7 +2,6 @@ import { GymOwnerController } from "../../src/controllers/gymOwner.controller";
 import { GymOwnerService, ChallengeParticipationService } from "../../src/services";
 import { Request, Response } from "express";
 
-// Mock Services
 const mockGymOwnerService = {
   getAllGymOwners: jest.fn(),
   getGymOwnerById: jest.fn(),

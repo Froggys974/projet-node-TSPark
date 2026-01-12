@@ -2,7 +2,6 @@ import { TrainingRoomController } from "../../src/controllers/trainingRoom.contr
 import { TrainingRoomService } from "../../src/services";
 import { Request, Response } from "express";
 
-// Mock Service
 const mockTrainingRoomService = {
   getAllTrainingRooms: jest.fn(),
   getTrainingRoomById: jest.fn(),
