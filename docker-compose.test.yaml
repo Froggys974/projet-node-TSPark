@@ -1,0 +1,12 @@
+services:
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: tspark-tests
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - PORT=3000
+    command: npm test

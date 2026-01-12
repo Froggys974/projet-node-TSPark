@@ -24,8 +24,16 @@ export class UserController {
     }
 
     async createUser(req: Request, res: Response): Promise<void> {
-        const user = await this.userService.createUser(req.body);
-        res.status(201).json(user);
+        if (!req.body.name || !req.body.email) {
+            res.status(400).json({ message: "Le nom et l'email sont requis" });
+            return;
+        }
+        try {
+            const user = await this.userService.createUser(req.body);
+            res.status(201).json(user);
+        } catch (error) {
+            res.status(500).json({ message: "Erreur lors de la création de l'utilisateur", error: (error as Error).message });
+        }
     }
 
     async updateUser(req: Request, res: Response): Promise<void> {
