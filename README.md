@@ -73,6 +73,7 @@ npm run bs # Build + Start
 # Tests
 npm test
 npm test -- --watch   # Mode watch (re-run automatique)
+npm test tests/unit/controllers (Unit Test Controllers)
 ```
 
 ## CI/CD
