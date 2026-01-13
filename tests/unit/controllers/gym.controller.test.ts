@@ -11,7 +11,7 @@ describe("GymController", () => {
     let gymController: GymController;
     let gymService: jest.Mocked<GymService>;
     let authMiddleware: jest.Mocked<AuthMiddleware>;
-    let req: Partial<Request>;
+    let req: any;
     let res: Partial<Response>;
     let statusMock: jest.Mock;
     let jsonMock: jest.Mock;

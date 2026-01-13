@@ -7,7 +7,7 @@ jest.mock("jsonwebtoken");
 
 describe("AuthMiddleware", () => {
     let authMiddleware: AuthMiddleware;
-    let req: Partial<Request>;
+    let req: any;
     let res: Partial<Response>;
     let next: NextFunction;
     let statusMock: jest.Mock;

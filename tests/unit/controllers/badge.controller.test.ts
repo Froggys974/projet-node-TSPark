@@ -11,7 +11,7 @@ describe("BadgeController", () => {
     let badgeController: BadgeController;
     let badgeService: jest.Mocked<BadgeService>;
     let authMiddleware: jest.Mocked<AuthMiddleware>;
-    let req: Partial<Request>;
+    let req: any;
     let res: Partial<Response>;
     let statusMock: jest.Mock;
     let jsonMock: jest.Mock;
