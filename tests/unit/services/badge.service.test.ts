@@ -9,10 +9,11 @@ describe("BadgeService", () => {
     beforeEach(() => {
         mockModel = {
             create: jest.fn(),
-            find: jest.fn(),
-            findById: jest.fn(),
-            findByIdAndUpdate: jest.fn(),
-            findByIdAndDelete: jest.fn(),
+            find: jest.fn().mockReturnThis(),
+            findById: jest.fn().mockReturnThis(),
+            findByIdAndUpdate: jest.fn().mockReturnThis(),
+            findByIdAndDelete: jest.fn().mockReturnThis(),
+            exec: jest.fn(),
         };
 
         mockMongoose = {
@@ -41,7 +42,7 @@ describe("BadgeService", () => {
     describe("getAllBadges", () => {
         it("should return all badges", async () => {
             const data = [{ id: "1", name: "Badge 1" }, { id: "2", name: "Badge 2" }];
-            mockModel.find.mockResolvedValue(data);
+            mockModel.exec.mockResolvedValue(data);
 
             const result = await service.getAllBadges();
 
@@ -53,7 +54,7 @@ describe("BadgeService", () => {
     describe("getBadgeById", () => {
         it("should return a badge by id", async () => {
             const data = { id: "1", name: "Badge 1" };
-            mockModel.findById.mockResolvedValue(data);
+            mockModel.exec.mockResolvedValue(data);
 
             const result = await service.getBadgeById("1");
 
@@ -61,5 +62,27 @@ describe("BadgeService", () => {
             expect(result).toEqual(data);
         });
     });
-});
+    
+    // Test update and delete too since you added logic for them
+    describe("updateBadge", () => {
+        it("should update a badge", async () => {
+            const data = { id: "1", name: "Badge Updated" };
+            mockModel.exec.mockResolvedValue(data);
 
+            const result = await service.updateBadge("1", { name: "Badge Updated" });
+            
+            expect(mockModel.findByIdAndUpdate).toHaveBeenCalled();
+            expect(result).toEqual(data);
+        });
+    });
+
+    describe("deleteBadge", () => {
+        it("should delete a badge", async () => {
+            mockModel.exec.mockResolvedValue(null);
+
+            await service.deleteBadge("1");
+
+            expect(mockModel.findByIdAndDelete).toHaveBeenCalledWith("1");
+        });
+    });
+});

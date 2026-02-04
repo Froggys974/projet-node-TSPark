@@ -56,13 +56,14 @@ async function createDefaultAdmin(userService: UserService): Promise<void> {
     }
 }
 
-async function main(): Promise<void> {
-    const mongooseConnexion = await openMongooseConnection();
+export async function createApp(mongooseConnexion: any): Promise<express.Application> {
     const app = express();
     app.use(express.json());
 
-    const healthCheckController = new HealthCheckController();
-    app.use("/health-check", healthCheckController.buildRouter());
+    // Validation Middleware (Global if needed, or per route)
+    // app.use(validationMiddleware.handle);
+
+    app.use("/health-check", new HealthCheckController().buildRouter());
 
     const userService = new UserService(mongooseConnexion);
 
@@ -125,12 +126,21 @@ async function main(): Promise<void> {
 
     app.use(ErrorMiddleware.handle);
 
-    const PORT = process.env.PORT as string;
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-    });
+    return app;
 }
 
-main().catch((err) => {
-    console.error("Error during main execution:", err);
-});
+if (require.main === module) {
+    async function main(): Promise<void> {
+        const mongooseConnexion = await openMongooseConnection();
+        const app = await createApp(mongooseConnexion);
+        
+        const PORT = process.env.PORT as string || 3000;
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    }
+
+    main().catch((err) => {
+        console.error("Error during main execution:", err);
+    });
+}
